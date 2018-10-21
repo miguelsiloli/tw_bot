@@ -8,10 +8,6 @@ Created on Fri Oct 19 14:13:36 2018
 import time
 from client import client
 from tw_api_exception import tw_api_exception
-import socket
-
-s = socket.getaddrinfo('localhost', 8080)
-print(s)
 
 class tw_api():
     
