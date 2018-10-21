@@ -118,7 +118,7 @@ class tw_api():
             res = ses.get(url)
             self.handle_response(res)
     
-    def handle_response(self, response: str, content: bool = False):
+    def handle_response(self, response: str, content: bool = False) -> None:
         
         if not str(response.status_code).startswith("2"):
             raise tw_api_exception(response)
