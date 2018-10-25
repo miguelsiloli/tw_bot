@@ -1,6 +1,10 @@
 import time
 from client import client
 
+# maybe making functions return status_code to troubleshoot 
+# if building order wasnt executed due to client-server fault 
+# or for specific in game reasons
+
 class tw_api():
     
     def __init__(self, username:str, password:str, gameworld: str):
@@ -10,6 +14,7 @@ class tw_api():
         self.session = client().session
         self.time = time.time()
         self._csrf_token = None
+        self._session_id = None
 
     @property
     def csrf_token(self):
@@ -18,11 +23,21 @@ class tw_api():
             village_id = self.session.cookies.get("global_village_id")
             url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=api&ajax=resources_schedule&id={village_id}&client_time={self.time}"
             res = self.session.get(url)
-            csrf_token = res.json()['game_data']['csrf'] 
-            return(csrf_token)
+            self._crsf_token = res.json()['game_data']['csrf'] 
+            return(self._csrf_token)
 
         else:
             self.login()
+    
+    @property
+    def session_id(self):
+
+        if not self._session_id:
+            village_id = self.session.cookies.get("global_village_id")
+            url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=api&ajax=resources_schedule&id={village_id}&client_time={self.time}"
+            res = self.session.get(url)
+            self._session_id = self.session.cookies.get_dict().get("sid")
+            return(self._session_id)
 
     def login(self):
 
@@ -90,3 +105,19 @@ class tw_api():
 
             if res.status_code == 200:
                 print("Train order sent successful!")
+
+    def build(self, village_id: str, building: str ) -> None:
+        
+        # accessing class property      
+        csrf_token = self.csrf_token
+        
+        base_url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=main&ajaxaction=upgrade_building&type=main&h={csrf_token}&&client_time={int(time.time())}"
+        body =   f"id={building}&force=1&destroy=0&source=5854"
+        
+        # send request
+        with self.session as ses:
+            res = ses.post(base_url, data=body, allow_redirects=False)
+
+            if res.status_code == 200:
+                print("Build order sent successful!")
+   
