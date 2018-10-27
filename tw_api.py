@@ -9,7 +9,7 @@ import time
 import select
 from client import client
 from bs4 import BeautifulSoup
-import re
+
 
 # maybe making functions return status_code to troubleshoot 
 # if building order wasnt executed due to client-server fault 
