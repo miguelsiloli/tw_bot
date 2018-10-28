@@ -223,21 +223,27 @@ class tw_api():
                               "Mina de Ferro", "Fazenda", "Armaz�m", "Muralha"]
     
             soup = BeautifulSoup(url, 'html.parser')
-            buildqueue = soup.find_all(id = "buildqueue") # find building queue
-            timer = soup.find("span", class_ = "timer")
-            construction_queue = {}
-            queue = []
-            for element in list(buildqueue):
-                element = element.find_all(class_="lit-item")
-                for ele in element:
-                    element = ele.text #ele.text) #building name #.find(class_="order-progress")
-                    for count in range(len(buildings_list)):
-                        if buildings_list[count] in element:  
-                            queue.append(buildings_list[count])
-                            if not construction_queue: # make sure you just get the first building                       
-                                construction_queue = {buildings_list[count+1]: timer.text}
 
-            return(construction_queue, queue)
+            try:
+                buildqueue = soup.find_all(id = "buildqueue") # find building queue
+                timer = soup.find("span", class_ = "timer")
+                construction_queue = {}
+                queue = []
+                for element in list(buildqueue):
+                    element = element.find_all(class_="lit-item")
+                    for ele in element:
+                        element = ele.text #ele.text) #building name #.find(class_="order-progress")
+                        for count in range(len(buildings_list)):
+                            if buildings_list[count] in element:  
+                                queue.append(buildings_list[count])
+                                if not construction_queue: # make sure you just get the first building                       
+                                    construction_queue = {buildings_list[count+1]: timer.text}
+
+                return(construction_queue, queue)
+
+            except AttributeError:
+                
+                return ({}) # return empty dict if nothing is being built
         
         url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=main"
             
