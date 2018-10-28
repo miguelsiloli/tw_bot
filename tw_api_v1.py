@@ -288,9 +288,29 @@ class tw_api():
 
             if res.status_code == 200:
                 print("Build order sent successful!")
+                
+    def train(self, village_id: str, view: str, unit:str, amount: str) -> None:
+        
+        """ units = [spear, sword, axe, archer -> barracks
+                     spy, light, marcher, heavy -> stable
+                     ram, catapult -> workshop
+                     knight -> statue
+                     snob -> snob
+                     militia -> farm] """
+       
+        csrf_token = self._csrf_token
+        
+        base_url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=stable&ajaxaction=train&mode=train&h={csrf_token}&&client_time={int(time.time())}"
+        body = f"units%5B{unit}%5D={amount}"
+        
+        # send request
+        with self.session as ses:
+            res = ses.post(base_url, data=body, allow_redirects=False)
 
+            if res.status_code == 200:
+                print("Train order sent successful!")                
 
-    def attack(self, village_id: str, target_village: dict, units: dict, attack: bool = True ) -> None:
+    def send_units(self, village_id: str, target_village: dict, units: dict, attack: bool = True ) -> None:
         
         """ target_village = {x: 123, y:123} 
             units -> {"spear": "", "sword": "", "axe": "", "archer": "", "spy": "", "light": "",
