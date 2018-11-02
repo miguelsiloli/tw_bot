@@ -357,7 +357,6 @@ class tw_api(object):
         with tw_api._session as ses:
 
             res  = ses.get(url).json()["game_data"]['village']
-            print(res)
             return(res) # good
 
     @staticmethod
@@ -397,17 +396,20 @@ class tw_api(object):
                         if unit in element.text:
                             quantity = [int(s) for s in element.text.split() if s.isdigit()][0]
                             orders.append({unit: {"duration": lista[1].text, "date_completion": lista[2].text, "quantity": quantity}})
-                print(orders)
+
                 return (orders)
 
             except AttributeError:
                 
                 return([]) # return empty list if not training any unit
 
+            except Exception: # for unknown exceptions and other exceptions such as unit not being researched or building not built
+                # add log
+                return([])
+
         with tw_api._session as ses:
 
             res = ses.get(url)
-            print(parser(res))
             return parser(res.text) # error when queue is empty
 
     @staticmethod
@@ -454,7 +456,7 @@ class tw_api(object):
                 
                 return([]) # return empty list if not training any unit
 
-            except Exception:
+            except Exception: # for unknown exceptions and other exceptions such as unit not being researched or building not built
                 # add log
                 return([])
 
@@ -462,7 +464,6 @@ class tw_api(object):
         with tw_api._session as ses:
 
             res = ses.get(url)
-            print(parser(res))
             return parser(res.text) # error when queue is empty
 
     @staticmethod
@@ -508,7 +509,7 @@ class tw_api(object):
                 
                 return([]) # return empty list if not training any unit
 
-            except Exception:
+            except Exception: # for unknown exceptions and other exceptions such as unit not being researched or building not built
                 # add log
                 return([])
 
@@ -518,7 +519,6 @@ class tw_api(object):
         with tw_api._session as ses:
 
                 res = ses.get(url).json()["content"]
-                print(res)
                 return(parser(res)) # error when queue is empty
     
     @staticmethod
@@ -552,13 +552,13 @@ class tw_api(object):
                 for element in list(buildqueue):
                     element = element.find_all(class_="lit-item")
                     for ele in element:
-                        element = ele.text #ele.text) #building name #.find(class_="order-progress")
+                        element = ele.text #building name #.find(class_="order-progress")
                         for count in range(len(buildings_list)):
                             if buildings_list[count] in element:  
                                 queue.append(buildings_list[count])
                                 if not construction_queue: # make sure you just get the first building                       
                                     construction_queue = {buildings_list[count+1]: timer.text}
-                print(construction_queue, queue)
+
                 return(construction_queue, queue)
 
             except AttributeError:
@@ -598,14 +598,89 @@ class tw_api(object):
         with tw_api._session as ses:
 
                 res = ses.get(url).text
-                print(parser(res))
+                return(parser(res)) # okay
+
+    @staticmethod
+    def smith_info(village_id:str) -> dict: # deprecated
+
+        """ {'spear': 'Pesquisado', 'spy': 'Requisitos em falta:', 'ram': 'Requisitos em falta:', 'sword': 'Pesquisado', 'light': 'Requisitos em     falta:', 'catapul': 'Requisitos em falta:', 'axe': 'Pesquisado', 'marcher': 'Requisitos em falta:', 'archer': 'Pesquisado', 'heavy':     'Requisitos em falta:'}
+        """
+
+        def parser(url:str) -> dict:
+
+            _units = ["spear", "spy", "ram", "sword", "light", "catapult", "axe", "marcher", "archer", "heavy"]
+            units = []
+            soup = BeautifulSoup(url, 'html.parser')
+
+            return
+
+
+        url = f"https://{tw_api._gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=smith"
+
+        with tw_api._session as ses:
+
+                res = ses.get(url).text
+                return(parser(res)) # okay
+
+    def population(village_id: str) -> dict:
+
+        def parser(url:str):
+            soup = BeautifulSoup(url, 'html.parser')
+            pop = soup.find(attrs={"id": "pop_current_label"}).text
+            pop_max = soup.find(attrs={"id": "pop_max_label"}).text
+            return({"pop": pop, "max_pop": pop_max})
+
+        url = f"https://{tw_api._gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=overview"
+
+        with tw_api._session as ses:
+
+                res = ses.get(url).text
                 return(parser(res)) # okay
 
     ##################              VILLAGE ORDERS ENDPOINT             ################## 
 
     # missing research unit
     # train is deprecated
-    
+
+    @staticmethod
+    def coin(village_id: str, coin_number: str) -> None:
+
+        """ coins coins """
+
+        csrf_token = tw_api._csrf_token
+
+        base_url = f"https://{tw_api._gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=snob&action=coin&h={csrf_token}"
+
+        body = f"count={coin_number}"
+
+        # send request
+        with tw_api._session as ses:
+            res = ses.post(base_url, data=body, allow_redirects=False)
+
+            if res.status_code == 200:
+                action_log("Research order sent successful!") # done
+
+    @staticmethod
+    def research_unit(village_id: str, unit: str) -> None:
+
+        """ units = [axe, archer,
+                     spy, light, marcher, heavy,
+                     ram, catapult] 
+            spear and sword are always researched 
+        """
+
+        csrf_token = tw_api._csrf_token
+
+        base_url = f"https://{tw_api._gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=smith&ajaxaction=research&h={csrf_token}&&client_time={int(time.time())}"
+        body = f"tech_id={unit}&source={village_id}"
+   
+        # send request
+        with tw_api._session as ses:
+            res = ses.post(base_url, data=body, allow_redirects=False)
+
+            if res.status_code == 200:
+                action_log("Research order sent successful!") # done
+
     @staticmethod
     def build(village_id: str, building: str ) -> None:
         
@@ -639,7 +714,7 @@ class tw_api(object):
         # send request
         with tw_api._session as ses:
             res = ses.post(base_url, data=body, allow_redirects=False)
-            print(res.text)
+
             if res.json()["response"]["success"] == "true": 
                 action_log("Train order sent successful!")
 
