@@ -2,3 +2,5 @@
 tribal wars bot
 
 ~ WIP ~
+
+-> World Data: working
