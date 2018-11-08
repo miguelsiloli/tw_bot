@@ -5,7 +5,7 @@ class client():
     """Modified requests.Requests class.
        :method get: REST GET 
        :method post: REST POST
-    
+    """
     def __init__(self):
         self.session = requests.Session()
     
