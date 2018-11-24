@@ -14,7 +14,7 @@ class Actions_Endpoint:
                     "400": "Bad Request", 
                     "500": "Internal Server Error"}
 
-    _instance = Session("Vanisher", "azulcaneta7", "pt64")
+    _instance = Session("Seelfed", "azulcaneta7", "pt64")
 
     def __init__(self):
 
@@ -96,7 +96,48 @@ class Actions_Endpoint:
             if res.status_code == 200:
                 print(f"Attack order sent successful! from: {village_id} to: {target} units: {units}")
 
-#Actions_Endpoint().build("28077", "garage")
-#units = {"spear": "0", "sword": "0", "axe": "0", "archer": "0", "spy": "1", "light": "7", "marcher": "0", "heavy": "0", "ram": "0", "catapult": "0", "knight":"0","snob":"0"}
-#target = {"x": 518, "y":437}
-#Actions_Endpoint().send_units("4284", target, units)
+    def sell_resources(self, village_id: str, quantity: str, threshold: int, resource: str):
+
+        base_url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=market&ajaxaction=exchange_begin&h={self.csrf_token}&client_time={self.time}"
+
+        body = f"sell_{resource}={quantity}"
+
+        with self.session as ses:
+
+            res = ses.post(base_url, data = body, allow_redirects=True)
+            response = res.json()["response"][0]
+            rate_hash = response["rate_hash"]
+            amount = abs(response["amount"])
+            if response["amount"]/response["cost"] <= threshold:
+
+                base_url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=market&ajaxaction=exchange_confirm&h={self.csrf_token}&client_time={self.time}"
+
+                body = f"rate_{resource}={rate_hash}&sell_stone={amount}&mb=1"
+
+                res = ses.post(base_url, data = body, allow_redirects=True) 
+
+            else:
+                pass
+
+    def cancel_command(self, village_id: str, attack_id: str):
+
+        base_url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=place&ajaxaction=cancel&h={self.csrf_token}&client_time={self.time}"
+
+        body = f"id={attack_id}&village={village_id}"
+
+        with self.session as ses:
+
+            res = ses.get(url)
+            if res == "https://www.tribalwars.com.pt/?session_expired=1":
+                raise SessionException
+
+        return(res.text) # okay
+
+time.sleep(13000)
+Actions_Endpoint()
+units = {"spear": "0", "sword": "0", "axe": "2100", "archer": "0", "spy": "0", "light": "750", "marcher": "0", "heavy": "0", "ram": "100", "catapult": "0", "knight":"1","snob":"0"}
+target = {"x": 407, "y":467}
+time.sleep(12200)
+Actions_Endpoint().send_units("4284", target, units)
+#Actions_Endpoint().sell_resources("4284", "100", 1, "wood")
+#print(Actions_Endpoint().cancel_command("4284"))

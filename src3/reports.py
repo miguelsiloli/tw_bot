@@ -11,6 +11,7 @@ class Reports:
                     "500": "Internal Server Error"}
 
     _instance = Session("Vanisher", "azulcaneta7", "pt64")
+   
 
     def __init__(self):
 
@@ -22,11 +23,12 @@ class Reports:
         self.gameworld = Reports._instance.gameworld
         self.village_id = Reports._instance.village_id
         self.csrf_token = Reports._instance.csrf_token
-        self.session_id = Reports._instance.session_id
+        self.session_id = Reports._instance.session_id 
+        self.base_url = f"https://{self.gameworld}.tribalwars.com.pt"
         self.time = time.time()
 
 
-    def attack(self, village_id: str, name_lookup: str, date_lookup: str):
+    def attack(self, village_id: str, name_lookup: str = None, date_lookup: str) -> list:
         """:returns:
                 [
           {
@@ -111,17 +113,58 @@ class Reports:
                 else:
                     return parser(res.text)
 
-        page_list = ["0", "12", "24", "48"]
+        page_list = ["0", "12", "24", "48", "60", "72", "84", "96", "108", "120"]
         for page in page_list:           
             url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=report&mode=attack&from={page}&group_id=0"
-            reports = []
-            reports.append(request(url))
+            reports = request(url)
             if found_flag == True:
                 return (reports)
 
         return []
 
+    def read(self, reports):
+        unit_list = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "catapult", "knight", "snob", "militia"]
 
-#print(Reports().attack("4284", "Vanisher (Aldeia de Papitips420) ataca -GooD MorNinG (516|442) K45", "nov 13, 16:35"))
+        def request(url: str):
+            with self.session as ses:
+
+                res  = ses.get(url)
+                if res.url == "https://www.tribalwars.com.pt/?session_expired=1":
+                    raise SessionException
+                else:
+                    return (res.text)
+
+        def parser(url: str):
+            # get attack luck, moral, date, attack troops, etc, attacker id, defender id
+            attacker_units = {}
+            attacker_losses = {}
+            soup  = BeautifulSoup(url, 'html.parser')
+            table = soup.find("table", attrs = {"id": "attack_luck"})
+            luck = table.find("b").text
+            table = soup.find("table", attrs = {"id": "attack_info_att"})
+            for unit in unit_list:
+                losses = table.find("td", attrs = {"class": "unit-item-" + unit}).find_next("tr")
+                try:
+                    qtt = table.find("td", attrs = {"class": "unit-item-" + unit}).text 
+                    loss = losses.find("td", attrs = {"class": "unit-item-" + unit}).text 
+                    attacker_units.update({unit: qtt})
+                    attacker_losses.update({unit: loss})
+                except AttributeError as e:
+                    print(e)
+                    pass
+            print(attacker_losses)
+
+        for report in reports:
+            href = report["href"]
+            url = self.base_url + href
+            parser(request(url))
+
+            break
+
+
+
+
+r = Reports().attack("4284", "Vanisher (Aldeia de Papitips420) ataca Aldeia de kurts (514|434) K45", "nov 17, 12:31")
+Reports().read(r)
 #https://pt64.tribalwars.com.pt/game.php?village=4284&screen=report&mode=all&group_id=0
 #https://pt64.tribalwars.com.pt/game.php?village=4284&screen=report&mode=all&group_id=13317

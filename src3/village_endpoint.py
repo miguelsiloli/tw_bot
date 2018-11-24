@@ -46,7 +46,7 @@ class Village_Endpoint:
                     "400": "Bad Request", 
                     "500": "Internal Server Error"}
 
-    _instance = Session("Vanisher", "azulcaneta7", "pt64")
+    _instance = Session("Seelfed", "azulcaneta7", "pt64")
 
     def __init__(self):
 
@@ -473,7 +473,7 @@ class Village_Endpoint:
             except AttributeError:
                 pass
 
-            return command_list
+            return soup
 
         url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=overview"
 
@@ -485,9 +485,53 @@ class Village_Endpoint:
 
         return(parser(res.text)) # okay
 
+    def premium_stock(self, village_id):
+        """:returns:
+        {
+          'response': {
+            'stock': {
+              'wood': 195479,
+              'stone': 203267,
+              'iron': 206000
+            },
+            'capacity': {
+              'wood': 217302,
+              'stone': 216307,
+              'iron': 214073
+            },
+            'rates': {
+              'wood': 0.002808407852,
+              'stone': 0.002269308146,
+              'iron': 0.001975003525
+            },
+            'tax': {
+              'buy': 0.03,
+              'sell': 0
+            },
+            'constants': {
+              'resource_base_price': 0.015,
+              'resource_price_elasticity': 0.0148,
+              'stock_size_modifier': 20000
+            },
+            'duration': 3600,
+            'merchants': 39,
+        }
+        """
 
+        url = f"https://{self.gameworld}.tribalwars.com.pt/game.php?village={village_id}&screen=market&ajax=exchange_data&client_time={self.time}"
+
+        with self.session as ses:
+
+            res = ses.get(url)
+            if res == "https://www.tribalwars.com.pt/?session_expired=1":
+                raise SessionException
+
+        return(res.json()) # okay
+
+
+#print(Village_Endpoint().premium_stock("4284"))
 #print(Village_Endpoint().troops_available("4284"))
-#print(Village_Endpoint().commands("25363"))
+#print(Village_Endpoint().commands("4284"))
 #print(Village_Endpoint().village_info("40568"))
 #print(Village_Endpoint().garage_queue("25382"))
 #print(Village_Endpoint().stable_queue("25382"))
@@ -495,3 +539,4 @@ class Village_Endpoint:
 #print(Village_Endpoint().construction_queue("25382"))
 #print(Village_Endpoint().merchant_status("25382"))
 #print(Village_Endpoint().population("25382"))
+
