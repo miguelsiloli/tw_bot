@@ -825,23 +825,3 @@ class tw_api:
 
             if res.status_code == 200:
                 action_log("Resources sent successfully! from: {village_id} to: target_village wood: {wood} stone: {stone} iron: {iron}") # done
-
-tw_api().login("Seelfed", "azulcaneta7", "pt62") 
-#print(tw_api().premium_features("28077"))
-#tw_api().player_info("28077")
-#tw_api().number_of_villages("28077")
-#tw_api().incoming("28077")
-#tw_api().troops_available("28077")
-#tw_api().attack_power("28077")
-time.sleep(5)
-print(tw_api().village_info("40568"))
-#tw_api().stable_queue("45367")
-#print(tw_api().garage_queue("45367"))
-#tw_api().construction_queue("38557")
-#print(tw_api().barracks_queue("45367"))
-#tw_api().merchant_status("28077")
-#tw_api().logout("28077")
-#tw_api().smith_info("40318")
-#tw_api().research_unit("40318", "ram")
-#print(tw_api().population("40318"))
-#tw_api().coin("25382", "1")
