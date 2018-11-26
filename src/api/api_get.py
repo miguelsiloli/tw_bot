@@ -29,7 +29,7 @@ class User_Endpoint:
                     "400": "Bad Request", 
                     "500": "Internal Server Error"}
 
-    _instance = Session("Seelfed", "azulcaneta7", "pt62")
+    _instance = Session("username", "password", "ptxx")
 
     def __init__(self):
 
