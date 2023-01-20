@@ -6,9 +6,8 @@ TribalWars Scrapper
 
 TribalWars (TW) scrapper is a high level fast web crawling API built on Requests and BeautifulSoup used to extract structured data (JSON format) and crawl TW pages. It can be used for a wide range of purposes, including simulating web-browser actions undetected, insert and plan custom commands, data mining with the market database, world data and reports analyzes (WIP)
 
-.. |Substitution Name| image:: https://github.com/lmao420blazeit/tw_bot/blob/master/img/classes.png
-  :width: 400
-  :alt: Alternative text
+.. image:: https://github.com/lmao420blazeit/tw_bot/blob/master/img/classes.png
+   :alt: Alternative text
 
 Requirements
 ============
