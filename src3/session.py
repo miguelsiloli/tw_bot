@@ -1,6 +1,5 @@
 # std lib dependancies
 import time
-import logging
 from tw_log import action_log
 
 # file dependencies
