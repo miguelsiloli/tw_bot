@@ -1,4 +1,5 @@
 .. image:: https://dspt.innogamescdn.com/asset/4d47dbcf/graphic/start2/bg-paladin.png
+   :height: 150px
    :target: https://www.tribalwars.com.pt/
    
 TribalWars Scrapper
