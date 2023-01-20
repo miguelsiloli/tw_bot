@@ -1,5 +1,7 @@
 # std lib dependancies
 import time
+import logging
+from tw_log import action_log
 
 # file dependencies
 from client import Client
@@ -66,9 +68,11 @@ class Session:
                 if res.url == "https://www.tribalwars.com.pt/?session_expired=1":
                     return(False)
                 else:
+                    action_log("Picking up previous session.")
                     return(True)
 
         except AttributeError:
+            action_log("Session not found, creating new session...")
             self.new_session()
             return(True)
 
@@ -115,11 +119,12 @@ class Session:
 
                     # check if login was successful
                     if res.status_code == 200 and self.csrf_token != None and self.session_id != None:
+                        action_log("Login successful!")
                         return (self.session)
 
 
             except Exception as e:
-                print("Log in error")
+                action_log("Wrong username & password combination")
 
 
     def logout(self) -> None:
