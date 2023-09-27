@@ -25,3 +25,8 @@ Requirements
 
 * Python 3.7+
 * Works on Linux, Windows, macOS, BSD
+
+TO DO
+============
+Replace JSON format to GraphQL (Graphene)
+Integrate CURL and Postman for API testing
